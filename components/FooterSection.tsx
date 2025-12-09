@@ -4,10 +4,15 @@ export default function FooterSection() {
   return (
     <footer className="px-6 py-14 md:py-20 bg-[#050509] border-t border-white/10">
       <div className="max-w-5xl mx-auto flex flex-col items-center text-center space-y-6">
-        
-        {/* Brand - Styled EXACTLY like Creati Studio */}
-        <div className="text-sm font-semibold tracking-[0.25em] text-white/80 uppercase">
-          CREATI STUDIO
+
+        {/* Creati Studio Logo — EXACTLY like Hero Nav */}
+        <div className="flex flex-col items-center select-none leading-[0.88]">
+          <span className="block font-extrabold text-xl tracking-tight text-white">
+            creati
+          </span>
+          <span className="block -mt-1 font-extrabold text-xl tracking-tight text-white">
+            studio
+          </span>
         </div>
 
         {/* Tagline */}
