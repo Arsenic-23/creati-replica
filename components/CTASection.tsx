@@ -9,10 +9,11 @@ gsap.registerPlugin(ScrollTrigger);
 export default function CTASection() {
   const sectionRef = useRef<HTMLElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      /** ENTRY ANIMATIONS */
       if (contentRef.current) {
         gsap.from(contentRef.current.children, {
           opacity: 0,
@@ -28,6 +29,37 @@ export default function CTASection() {
           },
         });
       }
+
+      /** FLOATING CLOUD FOLLOWING CURSOR LIKE CREATI.STUDIO */
+      const cloud = glowRef.current;
+      if (!cloud) return;
+
+      let targetX = 0;
+      let targetY = 0;
+
+      const moveCloud = (e: MouseEvent) => {
+        const rect = sectionRef.current?.getBoundingClientRect();
+        if (!rect) return;
+
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        targetX = x - rect.width / 2;
+        targetY = y - rect.height / 2;
+      };
+
+      /** Smooth GSAP follow + parallax */
+      gsap.to(cloud, {
+        x: () => targetX * 0.25,
+        y: () => targetY * 0.25,
+        duration: 1.8,
+        ease: "expo.out",
+        repeat: -1,
+      });
+
+      window.addEventListener("mousemove", moveCloud);
+
+      return () => window.removeEventListener("mousemove", moveCloud);
     }, sectionRef);
 
     return () => ctx.revert();
@@ -38,28 +70,38 @@ export default function CTASection() {
       ref={sectionRef}
       className="py-20 md:py-32 px-4 sm:px-6 lg:px-8 bg-[#0b0b10] text-white relative overflow-hidden"
     >
-      {/* Radial glow behind button */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+      {/* MOVING COLOR CLOUD (cursor-tracked) */}
+      <div
+        ref={glowRef}
+        className="pointer-events-none absolute w-[900px] h-[900px] rounded-full opacity-40 blur-[120px] -z-0"
+        style={{
+          background:
+            "radial-gradient(circle at 50% 50%, rgba(139,92,246,0.55), rgba(59,130,246,0.45), rgba(236,72,153,0.35), transparent 70%)",
+          transform: "translate(-50%, -50%)",
+        }}
+      />
+
+      {/* STATIC BACKGLOW (fallback + layering) */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none -z-10">
         <div
-          className="absolute w-[600px] h-[600px] rounded-full blur-3xl opacity-30"
+          className="absolute w-[600px] h-[600px] rounded-full blur-3xl opacity-25"
           style={{
             background:
-              "radial-gradient(circle, rgba(139, 92, 246, 0.4) 0%, rgba(59, 130, 246, 0.3) 50%, transparent 70%)",
+              "radial-gradient(circle, rgba(139, 92, 246, 0.35), rgba(59, 130, 246, 0.25), transparent 70%)",
             transform: "translateY(20%)",
           }}
         />
       </div>
 
-      <div className="max-w-4xl mx-auto text-center relative z-10">
+      <div className="max-w-4xl mx-auto text-center relative z-20">
         <div ref={contentRef}>
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 md:mb-8 tracking-tight leading-[1.1] text-white">
             Let's Start
           </h2>
 
-          {/* Circular arrow button */}
+          {/* CTA Button */}
           <div className="flex justify-center mt-10 md:mt-12">
             <button
-              ref={buttonRef}
               className="group relative w-20 h-20 md:w-24 md:h-24 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/30 transition-all duration-300 flex items-center justify-center backdrop-blur-sm"
               onMouseEnter={(e) => {
                 gsap.to(e.currentTarget, {
@@ -67,14 +109,6 @@ export default function CTASection() {
                   duration: 0.3,
                   ease: "power2.out",
                 });
-                const glow = e.currentTarget.querySelector(".button-glow");
-                if (glow) {
-                  gsap.to(glow, {
-                    opacity: 0.6,
-                    scale: 1.2,
-                    duration: 0.3,
-                  });
-                }
               }}
               onMouseLeave={(e) => {
                 gsap.to(e.currentTarget, {
@@ -82,29 +116,19 @@ export default function CTASection() {
                   duration: 0.3,
                   ease: "power2.out",
                 });
-                const glow = e.currentTarget.querySelector(".button-glow");
-                if (glow) {
-                  gsap.to(glow, {
-                    opacity: 0.3,
-                    scale: 1,
-                    duration: 0.3,
-                  });
-                }
               }}
             >
-              {/* Glow effect */}
+              {/* Subtle glow */}
               <div
-                className="button-glow absolute inset-0 rounded-full opacity-30"
+                className="absolute inset-0 rounded-full opacity-30 blur-xl"
                 style={{
                   background:
-                    "radial-gradient(circle, rgba(139, 92, 246, 0.6) 0%, rgba(59, 130, 246, 0.4) 50%, transparent 70%)",
-                  filter: "blur(20px)",
+                    "radial-gradient(circle, rgba(139,92,246,0.5), rgba(59,130,246,0.35), transparent 70%)",
                 }}
               />
 
-              {/* Arrow icon */}
               <svg
-                className="w-8 h-8 md:w-10 md:h-10 text-white transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300"
+                className="w-8 h-8 md:w-10 md:h-10 text-white transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-300"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -123,4 +147,3 @@ export default function CTASection() {
     </section>
   );
 }
-
